@@ -1,6 +1,7 @@
 import Container from "@/components/layout/Container";
 import ResponsiveGrid from "@/components/layout/ResponsiveGrid";
 import ProductCard from "@/components/products/ProductCard";
+import Link from "next/link";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -37,12 +38,9 @@ export default async function StoreDetailPage({ params }: Params) {
           <ResponsiveGrid>
             {store.products.map(
               (p: { id: string; name: string; price: number }) => (
-                <ProductCard
-                  key={p.id}
-                  id={p.id}
-                  name={p.name}
-                  price={p.price}
-                />
+                <Link key={p.id} href={`/products/${p.id}`}>
+                  <ProductCard id={p.id} name={p.name} price={p.price} />
+                </Link>
               )
             )}
           </ResponsiveGrid>
