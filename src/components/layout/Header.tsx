@@ -6,11 +6,14 @@ import { useSession, signOut } from "next-auth/react";
 import Container from "@/components/layout/Container";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { ShoppingCart, Search, LogIn } from "lucide-react";
+import { useCart } from "@/components/providers/CartProvider";
 
 export default function Header() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const router = useRouter();
+  const { state } = useCart();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-white/80 backdrop-blur">
@@ -36,12 +39,25 @@ export default function Header() {
         </div>
 
         <div className="flex-1 hidden lg:block">
-          <Input placeholder="Search furniture, brands..." />
+          <Input
+            leftIcon={<Search className="h-4 w-4" aria-hidden />}
+            placeholder="Search furniture, brands..."
+          />
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" aria-label="Cart">
-            Cart
+          <Button
+            variant="ghost"
+            aria-label="Cart"
+            onClick={() => router.push("/cart")}
+          >
+            <ShoppingCart className="h-5 w-5" />
+            <span className="sr-only">Cart</span>
+            {state.items.length > 0 ? (
+              <span className="ml-1 text-xs tabular-nums">
+                {state.items.length}
+              </span>
+            ) : null}
           </Button>
           {session?.user ? (
             <div className="flex items-center gap-2">
@@ -58,7 +74,7 @@ export default function Header() {
             </div>
           ) : (
             <Button size="sm" onClick={() => router.push("/sign-in")}>
-              Sign in
+              <LogIn className="mr-2 h-4 w-4" /> Sign in
             </Button>
           )}
         </div>
