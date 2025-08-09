@@ -18,6 +18,13 @@ enum Role {
   BUSINESS
 }
 
+enum OrderStatus {
+  PLACED
+  PROCESSING
+  SHIPPED
+  CANCELLED
+}
+
 model User {
   id       String   @id @default(uuid())
   email    String   @unique
@@ -48,6 +55,7 @@ model Order {
   id         String   @id @default(uuid())
   createdAt  DateTime @default(now())
   quantity   Int
+  status     OrderStatus @default(PLACED)
   user       User     @relation(fields: [userId], references: [id])
   userId     String
   product    Product  @relation(fields: [productId], references: [id])
