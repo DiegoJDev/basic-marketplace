@@ -1,20 +1,18 @@
-import { PrismaClient, Role } from "../src/generated/prisma";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Limpiar datos existentes (opcional)
   await prisma.order.deleteMany();
   await prisma.product.deleteMany();
   await prisma.store.deleteMany();
   await prisma.user.deleteMany();
 
-  // Crear usuario Business
   const business = await prisma.user.create({
     data: {
       email: "business@example.com",
       name: "Business Owner",
-      role: Role.BUSINESS,
+      role: "BUSINESS",
     },
   });
 
@@ -23,7 +21,7 @@ async function main() {
     data: {
       email: "client@example.com",
       name: "John Doe",
-      role: Role.CLIENT,
+      role: "CLIENT",
     },
   });
 
