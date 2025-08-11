@@ -2,6 +2,9 @@ import Container from "@/components/layout/Container";
 import ResponsiveGrid from "@/components/layout/ResponsiveGrid";
 import StoreCard from "@/components/stores/StoreCard";
 import Pagination from "@/components/ui/Pagination";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 
 async function fetchStores(baseUrl: string, page: number, perPage: number) {
@@ -24,6 +27,13 @@ export default async function StoresPage({
 }: {
   searchParams: { page?: string };
 }) {
+  const session = await getServerSession(authOptions);
+  if (
+    (session?.user as { role?: "CLIENT" | "BUSINESS" } | undefined)?.role ===
+    "BUSINESS"
+  ) {
+    redirect("/dashboard/stores");
+  }
   const page = Number(searchParams?.page ?? "1");
   const currentPage = Number.isFinite(page) && page > 0 ? page : 1;
   const perPage = 12;

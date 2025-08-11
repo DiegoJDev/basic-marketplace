@@ -2,6 +2,9 @@ import Container from "@/components/layout/Container";
 import ProductGridWithQuickAdd from "@/components/products/ProductGridWithQuickAdd";
 import Pagination from "@/components/ui/Pagination";
 import { headers } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { redirect } from "next/navigation";
 
 async function fetchProducts(baseUrl: string, page: number, perPage: number) {
   const res = await fetch(
@@ -23,6 +26,13 @@ export default async function ProductsPage({
 }: {
   searchParams: { page?: string };
 }) {
+  const session = await getServerSession(authOptions);
+  if (
+    (session?.user as { role?: "CLIENT" | "BUSINESS" } | undefined)?.role ===
+    "BUSINESS"
+  ) {
+    redirect("/dashboard/products");
+  }
   const page = Number(searchParams?.page ?? "1");
   const currentPage = Number.isFinite(page) && page > 0 ? page : 1;
   const perPage = 12;

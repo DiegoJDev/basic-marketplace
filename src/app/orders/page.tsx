@@ -39,6 +39,12 @@ export default async function OrdersPage({
 }: {
   searchParams: { page?: string };
 }) {
+  const sessionRole = (
+    (await getServerSession(authOptions))?.user as
+      | { role?: "CLIENT" | "BUSINESS" }
+      | undefined
+  )?.role;
+  if (sessionRole === "BUSINESS") redirect("/dashboard/orders");
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/sign-in?callbackUrl=/orders");
 
