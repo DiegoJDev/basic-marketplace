@@ -1,59 +1,96 @@
 # Basic Marketplace (Next.js App Router)
 
-Stack: Next.js (App Router), TypeScript, NextAuth (JWT), Prisma ORM (SQLite), Tailwind CSS v4, Headless UI, React Hook Form + Zod.
+Tecnologías: Next.js (App Router), TypeScript, NextAuth (JWT), Prisma ORM (SQLite), Tailwind CSS v4, Headless UI, React Hook Form + Zod.
 
-## Prerequisites
+## Requisitos
 
 - Node 18+
-- pnpm or npm
+- npm o pnpm
 
-## Setup
+## Configuración (paso a paso)
 
-1. Install deps
-   ```bash
-   npm install
-   ```
-2. Environment
-   Create `.env` with:
-   ```bash
-   DATABASE_URL="file:./prisma/dev.db"
-   NEXTAUTH_SECRET="dev-secret-change-me"
-   ```
-3. Database
-   ```bash
-   # reset, migrate and seed
-   npx prisma migrate reset --force
-   ```
-4. Dev server
-   ```bash
-   npm run dev
-   ```
+1. Instalar dependencias
 
-## Test users
+```bash
+npm install
+```
 
-- business@example.com → role BUSINESS (dashboard)
-- client@example.com → role CLIENT
+2. Variables de entorno (.env)
+   Crear un archivo `.env` en la raíz con:
 
-## Auth and roles
+```bash
+DATABASE_URL="file:./prisma/dev.db"
+NEXTAUTH_SECRET="dev-secret-change-me"
+```
 
-- Credentials provider (email only). No auto-register. Use /sign-up.
-- Middleware:
-  - Protege `/dashboard` para BUSINESS.
-  - BUSINESS allow-list: `/dashboard*` y `/about`.
-- Server protection: APIs usan `getServerSession` para verificar rol.
+3. Base de datos (migraciones + seed)
+   Opción rápida (recrear, migrar y sembrar):
 
-## Key routes
+```bash
+npx prisma migrate reset --force
+```
 
-- Public: `/`, `/stores`, `/products`, `/cart`, `/orders`, `/about`.
+Esto crea usuarios/tiendas/productos de prueba.
+
+4. Iniciar el servidor
+
+```bash
+npm run dev
+```
+
+Abrir `http://localhost:3000`.
+
+## Usuarios de prueba
+
+- `business@example.com` → rol BUSINESS (acceso a dashboard)
+- `client@example.com` → rol CLIENT (cliente)
+
+## Autenticación y roles
+
+- Inicio de sesión por email (Credentials). No hay contraseña; se usa solo el email.
+- Nota: Se eligió un flujo sin contraseña deliberadamente por los requisitos de la prueba. Reduce complejidad (sin almacenamiento/hasheado de contraseñas), acelera la evaluación del flujo y mantiene el foco en roles, permisos, UI/UX y checkout, tal como se solicita.
+- Registro en `/sign-up` con selección de rol. Tras registrarse:
+  - CLIENT: redirige a `/` o al `callbackUrl` si venía de `/cart`.
+  - BUSINESS: redirige a `/dashboard/stores`.
+- Middleware y guardas de servidor:
+  - Solo BUSINESS puede acceder a `/dashboard/*`.
+  - Si eres BUSINESS, se bloquean rutas públicas de cliente (`/stores`, `/products`, `/orders`) y se redirige al dashboard equivalente.
+
+## Rutas principales
+
+- Públicas: `/`, `/stores`, `/products`, `/cart`, `/orders`, `/about`.
 - Dashboard (BUSINESS): `/dashboard/stores`, `/dashboard/products`, `/dashboard/orders`.
 
-## Development helpers
+## Cómo probar (checklist rápido)
 
-- Prisma Studio: `npx prisma studio`
-- Reset DB + seed: `npx prisma migrate reset --force`
+1. Sin sesión:
+   - Visitar `/stores` y `/products` → ver paginación (12 por página) y navegación.
+   - Ir a `/cart` y pulsar “Pagar” → redirige a `/sign-in`. Completar login con `client@example.com` → vuelve a `/cart` para finalizar compra.
+2. Cliente (CLIENT):
+   - Agregar productos al carrito desde cualquier grilla (modal de “Agregar y seguir comprando”).
+   - Hacer checkout en `/cart` → crea órdenes y redirige a `/orders` (paginado 5 por página).
+3. Negocio (BUSINESS):
+   - Iniciar sesión con `business@example.com` → header de negocio y acceso solo a `/dashboard/*`.
+   - `/dashboard/stores` → ver tiendas propias (paginado) y crear nuevas.
+   - `/dashboard/products` → crear producto (nombre, precio en centavos, tienda, categoría). Los errores aparecen debajo de cada campo.
+   - `/dashboard/orders` → ver pedidos a tus tiendas y actualizar estado (Realizada/Procesando/Enviada/Cancelada).
 
-## Decisions
+## Comandos útiles
 
-- Prices stored in cents (Int). Zod validates bounds.
-- UI in Spanish; code, enums, DB in English. `src/lib/i18n.ts` mapea etiquetas.
-- Pagination via URL `?page=`; componente `Pagination` reutilizable.
+- Ver datos con Prisma Studio:
+
+```bash
+npx prisma studio
+```
+
+- Resetear base y volver a sembrar:
+
+```bash
+npx prisma migrate reset --force
+```
+
+## Notas de implementación
+
+- Precios en centavos (Int) con validación Zod (límite seguro de Int).
+- La UI está en español; el código, enums y datos en la BD permanecen en inglés. Los helpers en `src/lib/i18n.ts` mapean etiquetas (roles, estados, categorías) y formateos (`formatUsdEs`, `formatDateTimeEs`).
+- Paginación consistente vía `?page=` con el componente `Pagination`.
