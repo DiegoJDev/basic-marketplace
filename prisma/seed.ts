@@ -16,7 +16,6 @@ async function main() {
     },
   });
 
-  // Crear usuario Cliente
   const client = await prisma.user.create({
     data: {
       email: "client@example.com",
@@ -25,7 +24,6 @@ async function main() {
     },
   });
 
-  // Crear 8 tiendas
   const stores = await Promise.all(
     Array.from({ length: 8 }).map((_, i) =>
       prisma.store.create({
@@ -43,7 +41,6 @@ async function main() {
     "Sports", // Deportes y aire libre
   ] as const;
 
-  // Para cada tienda, crear de 3 a 5 productos aleatorios con categoría
   for (const s of stores) {
     const count = 3 + Math.floor(Math.random() * 3); // 3..5
     const data = Array.from({ length: count }).map((_, i) => {

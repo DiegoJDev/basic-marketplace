@@ -71,11 +71,8 @@ export default function Header() {
                 </Link>
               </>
             )}
-            {/* About link moved to footer */}
           </nav>
         </div>
-
-        {/* Search removed per requirements */}
 
         <div className="flex items-center gap-2">
           {isBusiness ? null : (

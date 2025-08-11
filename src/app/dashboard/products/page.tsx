@@ -3,7 +3,7 @@
 import Container from "@/components/layout/Container";
 import Button from "@/components/ui/Button";
 import Pagination from "@/components/ui/Pagination";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

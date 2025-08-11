@@ -1,4 +1,3 @@
-// Minimal auth guards for API routes to reduce repetition
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import type { Session } from "next-auth";

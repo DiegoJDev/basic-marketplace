@@ -3,17 +3,13 @@ import ProductGridWithQuickAdd from "@/components/products/ProductGridWithQuickA
 import prisma from "@/lib/prisma";
 import { categoryLabel } from "@/lib/i18n";
 
-// using shared Prisma client
-
 export default async function Home() {
-  // Distinct categories via Prisma
   const categories = await prisma.product.findMany({
     distinct: ["category"],
     select: { category: true },
     orderBy: { category: "asc" },
   });
 
-  // For each category, obtain up to 5 products ordered by name
   const sections = await Promise.all(
     categories.map(async (c) => {
       const items = await prisma.product.findMany({

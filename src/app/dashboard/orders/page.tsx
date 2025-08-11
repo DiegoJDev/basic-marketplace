@@ -49,8 +49,6 @@ export default function DashboardOrdersPage() {
       <Container>
         <h1 className="text-xl font-semibold">Pedidos (Negocio)</h1>
 
-        {/* Removed status filter per requirements */}
-
         <div className="mt-6 overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
