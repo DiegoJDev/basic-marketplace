@@ -40,14 +40,6 @@ export default async function Home() {
             <section key={section.category}>
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-medium">{section.category}</h2>
-                <Link
-                  href={`/products?category=${encodeURIComponent(
-                    section.category
-                  )}`}
-                  className="text-sm text-gray-700 hover:text-black"
-                >
-                  View all
-                </Link>
               </div>
               <div className="mt-4">
                 <ProductGridWithQuickAdd

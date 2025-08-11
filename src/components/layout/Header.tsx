@@ -78,12 +78,7 @@ export default function Header() {
           </nav>
         </div>
 
-        <div className="flex-1 hidden lg:block">
-          <Input
-            leftIcon={<Search className="h-4 w-4" aria-hidden />}
-            placeholder="Search furniture, brands..."
-          />
-        </div>
+        {/* Search removed per requirements */}
 
         <div className="flex items-center gap-2">
           {isBusiness ? null : (

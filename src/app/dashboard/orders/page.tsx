@@ -48,26 +48,7 @@ export default function DashboardOrdersPage() {
       <Container>
         <h1 className="text-xl font-semibold">Pedidos (Business)</h1>
 
-        <div className="mt-4 flex items-center gap-2">
-          <select
-            value={status}
-            onChange={(e) => {
-              const v = e.target.value;
-              setStatus(v);
-              const q = new URLSearchParams();
-              q.set("page", "1");
-              if (v) q.set("status", v);
-              window.location.href = `/dashboard/orders?${q.toString()}`;
-            }}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-          >
-            <option value="">Todos</option>
-            <option value="PLACED">PLACED</option>
-            <option value="PROCESSING">PROCESSING</option>
-            <option value="SHIPPED">SHIPPED</option>
-            <option value="CANCELLED">CANCELLED</option>
-          </select>
-        </div>
+        {/* Removed status filter per requirements */}
 
         <div className="mt-6 overflow-x-auto">
           <table className="min-w-full text-sm">
