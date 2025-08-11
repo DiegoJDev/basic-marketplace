@@ -1,4 +1,5 @@
 import Container from "@/components/layout/Container";
+import Pagination from "@/components/ui/Pagination";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
@@ -69,23 +70,12 @@ export default async function OrdersPage({
             </li>
           ))}
         </ul>
-        <div className="mt-6 flex items-center justify-between">
-          <a
-            className="text-sm text-gray-700 hover:text-black"
-            href={`/orders?page=${Math.max(1, data.page - 1)}`}
-          >
-            ← Anterior
-          </a>
-          <span className="text-sm text-gray-600">
-            Página {data.page} de {data.totalPages}
-          </span>
-          <a
-            className="text-sm text-gray-700 hover:text-black"
-            href={`/orders?page=${Math.min(data.totalPages, data.page + 1)}`}
-          >
-            Siguiente →
-          </a>
-        </div>
+        <Pagination
+          page={data.page}
+          totalPages={data.totalPages}
+          prevHref={`/orders?page=${Math.max(1, data.page - 1)}`}
+          nextHref={`/orders?page=${Math.min(data.totalPages, data.page + 1)}`}
+        />
       </Container>
     </div>
   );

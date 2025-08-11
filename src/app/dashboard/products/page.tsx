@@ -2,7 +2,9 @@
 
 import Container from "@/components/layout/Container";
 import Button from "@/components/ui/Button";
+import Pagination from "@/components/ui/Pagination";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productCreateSchema, type ProductCreateInput } from "@/lib/schemas";
@@ -15,6 +17,7 @@ export default function DashboardProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const params = useSearchParams();
   const [loading, setLoading] = useState(false);
   const {
     register,
@@ -41,8 +44,9 @@ export default function DashboardProductsPage() {
   }
 
   useEffect(() => {
-    load();
-  }, []);
+    const p = Math.max(1, Number(params.get("page") || 1));
+    load(p);
+  }, [params]);
 
   const canSubmit = useMemo(() => Object.keys(errors).length === 0, [errors]);
 
@@ -115,25 +119,11 @@ export default function DashboardProductsPage() {
             </li>
           ))}
         </ul>
-        <div className="mt-6 flex items-center justify-between">
-          <Button
-            variant="secondary"
-            disabled={page <= 1}
-            onClick={() => load(page - 1)}
-          >
-            ← Anterior
-          </Button>
-          <span className="text-sm text-gray-600">
-            Página {page} de {totalPages}
-          </span>
-          <Button
-            variant="secondary"
-            disabled={page >= totalPages}
-            onClick={() => load(page + 1)}
-          >
-            Siguiente →
-          </Button>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          hrefBuilder={(p) => `/dashboard/products?page=${p}`}
+        />
       </Container>
     </div>
   );

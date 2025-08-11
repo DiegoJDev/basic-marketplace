@@ -2,6 +2,7 @@ import Container from "@/components/layout/Container";
 import ResponsiveGrid from "@/components/layout/ResponsiveGrid";
 import StoreCard from "@/components/stores/StoreCard";
 import Link from "next/link";
+import Pagination from "@/components/ui/Pagination";
 import { headers } from "next/headers";
 
 async function fetchStores(baseUrl: string, page: number, perPage: number) {
@@ -47,23 +48,12 @@ export default async function StoresPage({
           </ResponsiveGrid>
         </div>
 
-        <div className="mt-8 flex items-center justify-between">
-          <Link
-            className="text-sm text-gray-700 hover:text-black disabled:opacity-50"
-            href={`/stores?page=${Math.max(1, data.page - 1)}`}
-          >
-            ← Anterior
-          </Link>
-          <span className="text-sm text-gray-600">
-            Página {data.page} de {data.totalPages}
-          </span>
-          <Link
-            className="text-sm text-gray-700 hover:text-black disabled:opacity-50"
-            href={`/stores?page=${Math.min(data.totalPages, data.page + 1)}`}
-          >
-            Siguiente →
-          </Link>
-        </div>
+        <Pagination
+          page={data.page}
+          totalPages={data.totalPages}
+          prevHref={`/stores?page=${Math.max(1, data.page - 1)}`}
+          nextHref={`/stores?page=${Math.min(data.totalPages, data.page + 1)}`}
+        />
       </Container>
     </div>
   );

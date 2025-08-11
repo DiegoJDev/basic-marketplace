@@ -1,8 +1,9 @@
 "use client";
 
 import Container from "@/components/layout/Container";
-import Button from "@/components/ui/Button";
-import { useEffect, useMemo, useState } from "react";
+import Pagination from "@/components/ui/Pagination";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 type Row = {
   id: string;
@@ -18,6 +19,7 @@ export default function DashboardOrdersPage() {
   const [status, setStatus] = useState<string>("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const params = useSearchParams();
 
   async function load(p = 1, st = "") {
     const params = new URLSearchParams();
@@ -35,8 +37,11 @@ export default function DashboardOrdersPage() {
   }
 
   useEffect(() => {
-    load(1, "");
-  }, []);
+    const p = Math.max(1, Number(params.get("page") || 1));
+    const st = params.get("status") || "";
+    setStatus(st);
+    load(p, st);
+  }, [params]);
 
   return (
     <div className="py-6">
@@ -49,7 +54,10 @@ export default function DashboardOrdersPage() {
             onChange={(e) => {
               const v = e.target.value;
               setStatus(v);
-              load(1, v);
+              const q = new URLSearchParams();
+              q.set("page", "1");
+              if (v) q.set("status", v);
+              window.location.href = `/dashboard/orders?${q.toString()}`;
             }}
             className="rounded-md border border-gray-300 px-3 py-2 text-sm"
           >
@@ -110,25 +118,13 @@ export default function DashboardOrdersPage() {
             </tbody>
           </table>
         </div>
-        <div className="mt-6 flex items-center justify-between">
-          <Button
-            variant="secondary"
-            disabled={page <= 1}
-            onClick={() => load(page - 1, status)}
-          >
-            ← Anterior
-          </Button>
-          <span className="text-sm text-gray-600">
-            Página {page} de {totalPages}
-          </span>
-          <Button
-            variant="secondary"
-            disabled={page >= totalPages}
-            onClick={() => load(page + 1, status)}
-          >
-            Siguiente →
-          </Button>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          hrefBuilder={(p) =>
+            `/dashboard/orders?page=${p}${status ? `&status=${status}` : ""}`
+          }
+        />
       </Container>
     </div>
   );
