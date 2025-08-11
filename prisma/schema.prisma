@@ -46,6 +46,7 @@ model Product {
   id        String   @id @default(uuid())
   name      String
   price     Int
+  category  String   @default("General")
   store     Store    @relation(fields: [storeId], references: [id])
   storeId   String
   orders    Order[]

@@ -2,6 +2,7 @@ import Container from "@/components/layout/Container";
 import ResponsiveGrid from "@/components/layout/ResponsiveGrid";
 import ProductCard from "@/components/products/ProductCard";
 import Link from "next/link";
+import ProductGridWithQuickAdd from "@/components/products/ProductGridWithQuickAdd";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -33,17 +34,11 @@ export default async function StoreDetailPage({ params }: Params) {
     <div className="py-6">
       <Container>
         <h1 className="text-xl font-semibold">{store.name}</h1>
-
         <div className="mt-6">
-          <ResponsiveGrid>
-            {store.products.map(
-              (p: { id: string; name: string; price: number }) => (
-                <Link key={p.id} href={`/products/${p.id}`}>
-                  <ProductCard id={p.id} name={p.name} price={p.price} />
-                </Link>
-              )
-            )}
-          </ResponsiveGrid>
+          <ProductGridWithQuickAdd
+            products={store.products}
+            hrefBase="/products/"
+          />
         </div>
       </Container>
     </div>

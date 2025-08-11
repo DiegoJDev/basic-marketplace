@@ -25,47 +25,44 @@ async function main() {
     },
   });
 
-  // Crear tienda para el Business
-  const store = await prisma.store.create({
-    data: {
-      name: "Demo Store",
-      ownerId: business.id,
-    },
-  });
+  // Crear 8 tiendas
+  const stores = await Promise.all(
+    Array.from({ length: 8 }).map((_, i) =>
+      prisma.store.create({
+        data: { name: `Store ${i + 1}`, ownerId: business.id },
+      })
+    )
+  );
 
-  // Más tiendas para paginación
-  const extraStoresData = Array.from({ length: 15 }).map((_, i) => ({
-    name: `Store ${i + 1}`,
-    ownerId: business.id,
-  }));
-  await prisma.store.createMany({ data: extraStoresData });
+  // Categorías en inglés de una sola palabra
+  const categories = [
+    "Electronics", // Electrónica
+    "Clothing", // Ropa y accesorios
+    "Home", // Hogar y cocina
+    "Beauty", // Belleza y cuidado personal
+    "Sports", // Deportes y aire libre
+  ] as const;
 
-  // Crear producto en la tienda
-  const product = await prisma.product.create({
-    data: {
-      name: "Awesome Widget",
-      price: 1999,
-      storeId: store.id,
-    },
-  });
-
-  // Productos para las tiendas extra
-  const allStores = await prisma.store.findMany({ select: { id: true } });
-  for (const s of allStores) {
-    const productsData = Array.from({ length: 6 }).map((_, i) => ({
-      name: `Product ${i + 1} of ${s.id.slice(0, 4)}`,
-      price: 1000 + i * 250,
-      storeId: s.id,
-    }));
-    await prisma.product.createMany({ data: productsData });
+  // Para cada tienda, crear de 3 a 5 productos aleatorios con categoría
+  for (const s of stores) {
+    const count = 3 + Math.floor(Math.random() * 3); // 3..5
+    const data = Array.from({ length: count }).map((_, i) => {
+      const category =
+        categories[Math.floor(Math.random() * categories.length)];
+      const base = 1000 + Math.floor(Math.random() * 3000);
+      return {
+        name: `${category} Product ${i + 1}`,
+        price: base,
+        category,
+        storeId: s.id,
+      };
+    });
+    await prisma.product.createMany({ data });
   }
 
-  console.log({
-    business,
-    client,
-    stores: 1 + extraStoresData.length,
-    product,
-  });
+  const totalStores = await prisma.store.count();
+  const totalProducts = await prisma.product.count();
+  console.log({ business, client, totalStores, totalProducts });
 }
 
 main()
