@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-  const { name, price, storeId } = parsed.data;
+  const { name, price, storeId, category } = parsed.data;
 
   // Validate ownership of store
   const store = await prisma.store.findFirst({
@@ -63,8 +63,14 @@ export async function POST(request: Request) {
   }
 
   const product = await prisma.product.create({
-    data: { name, price, storeId },
-    select: { id: true, name: true, price: true, storeId: true },
+    data: { name, price, storeId, category },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      storeId: true,
+      category: true,
+    },
   });
   return NextResponse.json(product, { status: 201 });
 }

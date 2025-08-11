@@ -44,7 +44,7 @@ export default function AddToCartButton({
         className="w-16 rounded-md border border-gray-300 px-2 py-2 text-sm"
       />
       <Button disabled={!canAdd} onClick={onClick}>
-        Add to cart
+        Agregar al carrito
       </Button>
     </div>
   );

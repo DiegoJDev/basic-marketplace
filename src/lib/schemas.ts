@@ -17,7 +17,9 @@ export const productCreateSchema = z.object({
   price: z
     .number()
     .int("Debe ser entero (cents)")
-    .positive("Debe ser mayor a 0"),
+    .positive("Debe ser mayor a 0")
+    .max(2147483647, "Máximo permitido 2,147,483,647"),
+  category: z.enum(["Electronics", "Clothing", "Home", "Beauty", "Sports"]),
   storeId: z.string().uuid("ID de tienda inválido"),
 });
 
@@ -33,6 +35,9 @@ export const productUpdateSchema = z.object({
     .number()
     .int("Debe ser entero (cents)")
     .positive("Debe ser mayor a 0")
+    .optional(),
+  category: z
+    .enum(["Electronics", "Clothing", "Home", "Beauty", "Sports"])
     .optional(),
 });
 

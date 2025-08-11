@@ -4,7 +4,7 @@ export default function AboutPage() {
   return (
     <div className="py-10">
       <Container>
-        <h1 className="text-2xl font-semibold">About</h1>
+        <h1 className="text-2xl font-semibold">Acerca de</h1>
         <p className="mt-4 text-sm text-gray-700">
           Esta es una prueba técnica (Basic Marketplace) desarrollada para
           demostrar autenticación, autorización por roles, panel de negocio,

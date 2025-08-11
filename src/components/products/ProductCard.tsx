@@ -46,7 +46,7 @@ export default function ProductCard({
               addItem({ productId: id, name, price });
             }}
           >
-            Add to cart
+            Agregar al carrito
           </Button>
         </div>
       </div>

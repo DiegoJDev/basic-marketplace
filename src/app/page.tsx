@@ -1,7 +1,7 @@
 import Container from "@/components/layout/Container";
 import ProductGridWithQuickAdd from "@/components/products/ProductGridWithQuickAdd";
-import Link from "next/link";
 import { PrismaClient } from "@prisma/client";
+import { categoryLabel } from "@/lib/i18n";
 
 const prisma = new PrismaClient();
 
@@ -33,13 +33,19 @@ export default async function Home() {
   return (
     <div className="py-6">
       <Container>
-        <h1 className="text-2xl font-semibold">Discover our top picks</h1>
+        <h1 className="text-2xl font-semibold">
+          Descubre nuestras mejores selecciones
+        </h1>
 
         <div className="mt-6 space-y-10">
           {sections.map((section) => (
             <section key={section.category}>
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-medium">{section.category}</h2>
+                <h2 className="text-lg font-medium">
+                  {categoryLabel(
+                    section.category as unknown as import("@/lib/i18n").ProductCategory
+                  )}
+                </h2>
               </div>
               <div className="mt-4">
                 <ProductGridWithQuickAdd

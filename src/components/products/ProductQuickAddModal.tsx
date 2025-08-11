@@ -25,6 +25,7 @@ export default function ProductQuickAddModal({
   if (!product) return null;
 
   function add(times: number) {
+    if (!product) return;
     for (let i = 0; i < times; i += 1)
       addItem({
         productId: product.id,
@@ -43,7 +44,7 @@ export default function ProductQuickAddModal({
               <h3 className="text-base font-semibold">{product.name}</h3>
               <button
                 className="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-gray-100"
-                aria-label="Close"
+                aria-label="Cerrar"
                 onClick={onClose}
               >
                 <X className="h-5 w-5" />
@@ -72,7 +73,7 @@ export default function ProductQuickAddModal({
                   router.push("/cart");
                 }}
               >
-                Add & Go to cart
+                Agregar e ir al carrito
               </Button>
               <Button
                 variant="secondary"
@@ -81,7 +82,7 @@ export default function ProductQuickAddModal({
                   onClose();
                 }}
               >
-                Add & keep shopping
+                Agregar y seguir comprando
               </Button>
             </div>
           </DialogPanel>

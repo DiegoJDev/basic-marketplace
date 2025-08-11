@@ -10,7 +10,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { productCreateSchema, type ProductCreateInput } from "@/lib/schemas";
 
 type Store = { id: string; name: string };
-type Product = { id: string; name: string; price: number; storeId: string };
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  storeId: string;
+  category?: string;
+};
 
 export default function DashboardProductsPage() {
   const [stores, setStores] = useState<Store[]>([]);
@@ -26,7 +32,7 @@ export default function DashboardProductsPage() {
     formState: { errors },
   } = useForm<ProductCreateInput>({
     resolver: zodResolver(productCreateSchema),
-    defaultValues: { name: "", price: 0, storeId: "" },
+    defaultValues: { name: "", price: 0, storeId: "", category: "Electronics" },
   });
 
   async function load(p = 1) {
@@ -105,6 +111,19 @@ export default function DashboardProductsPage() {
           </select>
           {errors.storeId ? (
             <p className="text-xs text-red-600">{errors.storeId.message}</p>
+          ) : null}
+          <select
+            {...register("category")}
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          >
+            <option value="Electronics">Electrónica</option>
+            <option value="Clothing">Ropa y accesorios</option>
+            <option value="Home">Hogar y cocina</option>
+            <option value="Beauty">Belleza y cuidado personal</option>
+            <option value="Sports">Deportes y aire libre</option>
+          </select>
+          {errors.category ? (
+            <p className="text-xs text-red-600">{errors.category.message}</p>
           ) : null}
           <Button disabled={loading || !canSubmit}>Crear</Button>
         </form>

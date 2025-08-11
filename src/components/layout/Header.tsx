@@ -5,8 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import Container from "@/components/layout/Container";
 import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
-import { ShoppingCart, Search, LogIn } from "lucide-react";
+import { ShoppingCart, LogIn } from "lucide-react";
 import { useCart } from "@/components/providers/CartProvider";
 
 export default function Header() {
@@ -33,7 +32,7 @@ export default function Header() {
                   href="/dashboard/stores"
                   className={navClass(pathname.startsWith("/dashboard/stores"))}
                 >
-                  Stores
+                  Tiendas
                 </Link>
                 <Link
                   href="/dashboard/products"
@@ -41,13 +40,13 @@ export default function Header() {
                     pathname.startsWith("/dashboard/products")
                   )}
                 >
-                  Products
+                  Productos
                 </Link>
                 <Link
                   href="/dashboard/orders"
                   className={navClass(pathname.startsWith("/dashboard/orders"))}
                 >
-                  Orders
+                  Pedidos
                 </Link>
               </>
             ) : (
@@ -56,25 +55,23 @@ export default function Header() {
                   href="/stores"
                   className={navClass(pathname === "/stores")}
                 >
-                  Stores
+                  Tiendas
                 </Link>
                 <Link
                   href="/products"
                   className={navClass(pathname === "/products")}
                 >
-                  Products
+                  Productos
                 </Link>
                 <Link
                   href="/orders"
                   className={navClass(pathname === "/orders")}
                 >
-                  Orders
+                  Órdenes
                 </Link>
               </>
             )}
-            <Link href="/about" className={navClass(pathname === "/about")}>
-              About
-            </Link>
+            {/* About link moved to footer */}
           </nav>
         </div>
 
@@ -84,11 +81,11 @@ export default function Header() {
           {isBusiness ? null : (
             <Button
               variant="ghost"
-              aria-label="Cart"
+              aria-label="Carrito"
               onClick={() => router.push("/cart")}
             >
               <ShoppingCart className="h-5 w-5" />
-              <span className="sr-only">Cart</span>
+              <span className="sr-only">Carrito</span>
               {totalQuantity > 0 ? (
                 <span className="ml-1 text-xs tabular-nums">
                   {totalQuantity}
@@ -106,20 +103,20 @@ export default function Header() {
                 variant="secondary"
                 onClick={() => signOut({ callbackUrl: "/" })}
               >
-                Sign out
+                Cerrar sesión
               </Button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <Button size="sm" onClick={() => router.push("/sign-in")}>
-                <LogIn className="mr-2 h-4 w-4" /> Sign in
+                <LogIn className="mr-2 h-4 w-4" /> Iniciar sesión
               </Button>
               <Button
                 size="sm"
                 variant="secondary"
                 onClick={() => router.push("/sign-up")}
               >
-                Sign up
+                Crear cuenta
               </Button>
             </div>
           )}

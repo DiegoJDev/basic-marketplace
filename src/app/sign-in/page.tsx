@@ -46,7 +46,7 @@ export default function SignInPage() {
         onSubmit={onSubmit}
         className="w-full max-w-sm rounded-2xl border p-4 space-y-4"
       >
-        <h1 className="text-xl font-semibold">Sign in</h1>
+        <h1 className="text-xl font-semibold">Iniciar sesión</h1>
         <label className="block space-y-2">
           <span className="text-sm">Email</span>
           <input
@@ -68,11 +68,11 @@ export default function SignInPage() {
           disabled={isLoading}
           className="w-full rounded-md bg-black text-white py-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? "Ingresando..." : "Continue"}
+          {isLoading ? "Ingresando..." : "Continuar"}
         </button>
 
         <p className="text-sm text-center text-neutral-600">
-          Don’t have an account?{" "}
+          ¿No tienes una cuenta?{" "}
           <a
             href={`/sign-up${
               callbackUrl
@@ -81,7 +81,7 @@ export default function SignInPage() {
             }`}
             className="underline"
           >
-            Create one
+            Crear una
           </a>
         </p>
 

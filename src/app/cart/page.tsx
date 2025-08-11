@@ -41,9 +41,9 @@ export default function CartPage() {
   return (
     <div className="py-6">
       <Container>
-        <h1 className="text-xl font-semibold">Cart</h1>
+        <h1 className="text-xl font-semibold">Carrito</h1>
         {isEmpty ? (
-          <p className="mt-4 text-sm text-gray-600">Your cart is empty.</p>
+          <p className="mt-4 text-sm text-gray-600">Tu carrito está vacío.</p>
         ) : (
           <div className="mt-6 space-y-4">
             <ul className="divide-y rounded-md border bg-white">
@@ -67,7 +67,7 @@ export default function CartPage() {
                     size="sm"
                     onClick={() => removeItem(i.productId)}
                   >
-                    Remove
+                    Quitar
                   </Button>
                 </li>
               ))}
@@ -83,10 +83,10 @@ export default function CartPage() {
             </div>
             <div className="flex items-center justify-end gap-2">
               <Button variant="secondary" onClick={clear}>
-                Clear
+                Vaciar
               </Button>
               <Button onClick={checkout} disabled={isEmpty}>
-                Checkout
+                Pagar
               </Button>
             </div>
           </div>

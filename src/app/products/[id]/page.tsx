@@ -34,7 +34,7 @@ export default async function ProductDetailPage({ params }: Params) {
             <h1 className="text-2xl font-semibold">{product.name}</h1>
             <p className="mt-2 text-lg">${(product.price / 100).toFixed(2)}</p>
             <p className="mt-2 text-sm text-gray-600">
-              Store: {product.store.name}
+              Tienda: {product.store.name}
             </p>
             <div className="mt-6">
               <AddToCartButton

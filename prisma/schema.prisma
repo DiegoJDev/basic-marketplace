@@ -26,39 +26,39 @@ enum OrderStatus {
 }
 
 model User {
-  id       String   @id @default(uuid())
-  email    String   @unique
-  name     String?
-  role     Role     @default(CLIENT)
-  orders   Order[]
-  stores   Store[]
+  id     String  @id @default(uuid())
+  email  String  @unique
+  name   String?
+  role   Role    @default(CLIENT)
+  orders Order[] @relation("OrderUser")
+  stores Store[]
 }
 
 model Store {
-  id        String    @id @default(uuid())
-  name      String
-  owner     User      @relation(fields: [ownerId], references: [id])
-  ownerId   String
-  products  Product[]
+  id       String    @id @default(uuid())
+  name     String
+  owner    User      @relation(fields: [ownerId], references: [id])
+  ownerId  String
+  products Product[]
 }
 
 model Product {
-  id        String   @id @default(uuid())
-  name      String
-  price     Int
-  category  String   @default("General")
-  store     Store    @relation(fields: [storeId], references: [id])
-  storeId   String
-  orders    Order[]
+  id       String  @id @default(uuid())
+  name     String
+  price    Int
+  category String  @default("General")
+  store    Store   @relation(fields: [storeId], references: [id])
+  storeId  String
+  orders   Order[]
 }
 
 model Order {
-  id         String      @id @default(uuid())
-  createdAt  DateTime    @default(now())
-  quantity   Int
-  status     OrderStatus @default(PLACED)
-  user       User        @relation("OrderUser", fields: [userId], references: [id])
-  userId     String
-  product    Product     @relation(fields: [productId], references: [id])
-  productId  String
+  id        String      @id @default(uuid())
+  createdAt DateTime    @default(now())
+  quantity  Int
+  status    OrderStatus @default(PLACED)
+  user      User        @relation("OrderUser", fields: [userId], references: [id])
+  userId    String
+  product   Product     @relation(fields: [productId], references: [id])
+  productId String
 }

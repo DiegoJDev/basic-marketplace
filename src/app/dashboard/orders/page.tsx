@@ -46,7 +46,7 @@ export default function DashboardOrdersPage() {
   return (
     <div className="py-6">
       <Container>
-        <h1 className="text-xl font-semibold">Pedidos (Business)</h1>
+        <h1 className="text-xl font-semibold">Pedidos (Negocio)</h1>
 
         {/* Removed status filter per requirements */}
 
@@ -88,10 +88,10 @@ export default function DashboardOrdersPage() {
                       }}
                       className="rounded-md border border-gray-300 px-2 py-1 text-xs"
                     >
-                      <option value="PLACED">PLACED</option>
-                      <option value="PROCESSING">PROCESSING</option>
-                      <option value="SHIPPED">SHIPPED</option>
-                      <option value="CANCELLED">CANCELLED</option>
+                      <option value="PLACED">Realizada</option>
+                      <option value="PROCESSING">Procesando</option>
+                      <option value="SHIPPED">Enviada</option>
+                      <option value="CANCELLED">Cancelada</option>
                     </select>
                   </td>
                 </tr>

@@ -8,14 +8,8 @@ export default function Footer() {
           © {new Date().getFullYear()} Basic Marketplace. All rights reserved.
         </p>
         <nav className="flex items-center gap-4">
-          <a href="#" className="hover:text-black">
-            Privacy
-          </a>
-          <a href="#" className="hover:text-black">
-            Terms
-          </a>
-          <a href="#" className="hover:text-black">
-            Contact
+          <a href="/about" className="hover:text-black">
+            Acerca de
           </a>
         </nav>
       </Container>
