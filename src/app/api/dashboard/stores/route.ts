@@ -1,31 +1,42 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import prisma from "@/lib/prisma";
+import { requireBusiness } from "@/lib/api-auth";
 import { storeCreateSchema } from "@/lib/schemas";
-
-const prisma = new PrismaClient();
+import { PER_PAGE } from "@/lib/config";
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "BUSINESS") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireBusiness();
+  if ("error" in auth) return auth.error;
   const { searchParams } = new URL(request.url);
   const page = Math.max(1, Number(searchParams.get("page") || 1));
-  const perPage = 5;
+  const perPageParam = searchParams.get("perPage");
+  const all = perPageParam === "all";
+  const perPage = all ? PER_PAGE : PER_PAGE;
   const [items, total] = await Promise.all([
     prisma.store.findMany({
-      where: { ownerId: (session.user as { id: string }).id },
+      where: { ownerId: auth.userId },
       orderBy: { name: "asc" },
       select: { id: true, name: true },
-      skip: (page - 1) * perPage,
-      take: perPage,
+      ...(all
+        ? {}
+        : {
+            skip: (page - 1) * perPage,
+            take: perPage,
+          }),
     }),
     prisma.store.count({
-      where: { ownerId: (session.user as { id: string }).id },
+      where: { ownerId: auth.userId },
     }),
   ]);
+  if (all) {
+    return NextResponse.json({
+      items,
+      total,
+      page: 1,
+      perPage: total,
+      totalPages: 1,
+    });
+  }
   return NextResponse.json({
     items,
     total,
@@ -36,10 +47,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "BUSINESS") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireBusiness();
+  if ("error" in auth) return auth.error;
   const json = await request.json().catch(() => null);
   const parsed = storeCreateSchema.safeParse(json);
   if (!parsed.success) {
@@ -50,7 +59,7 @@ export async function POST(request: Request) {
   }
   const { name } = parsed.data;
   const store = await prisma.store.create({
-    data: { name, ownerId: (session.user as { id: string }).id },
+    data: { name, ownerId: auth.userId },
     select: { id: true, name: true },
   });
   return NextResponse.json(store, { status: 201 });

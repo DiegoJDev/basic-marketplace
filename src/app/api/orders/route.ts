@@ -1,21 +1,18 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import prisma from "@/lib/prisma";
+import { requireAuth } from "@/lib/api-auth";
 import { orderCreateSchema } from "@/lib/schemas";
-
-const prisma = new PrismaClient();
+import { PER_PAGE } from "@/lib/config";
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
   const { searchParams } = new URL(request.url);
   const page = Math.max(1, Number(searchParams.get("page") || 1));
-  const perPage = 5;
+  const perPage = PER_PAGE;
   const [items, total] = await Promise.all([
     prisma.order.findMany({
-      where: { userId: (session.user as { id: string }).id },
+      where: { userId: auth.userId },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -26,9 +23,7 @@ export async function GET(request: Request) {
       skip: (page - 1) * perPage,
       take: perPage,
     }),
-    prisma.order.count({
-      where: { userId: (session.user as { id: string }).id },
-    }),
+    prisma.order.count({ where: { userId: auth.userId } }),
   ]);
   return NextResponse.json({
     items,
@@ -40,9 +35,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
 
   const json = await request.json().catch(() => null);
   const parsed = orderCreateSchema.safeParse(json);
@@ -69,7 +63,7 @@ export async function POST(request: Request) {
     );
 
   // Create orders (one row per item)
-  const userId = (session.user as { id: string }).id;
+  const userId = auth.userId;
   await prisma.$transaction(
     items.map((i) =>
       prisma.order.create({

@@ -1,31 +1,27 @@
 import Container from "@/components/layout/Container";
 import ProductGridWithQuickAdd from "@/components/products/ProductGridWithQuickAdd";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { categoryLabel } from "@/lib/i18n";
 
-const prisma = new PrismaClient();
+// using shared Prisma client
 
 export default async function Home() {
-  // Obtener categorías distintas
-  const categories = await prisma.$queryRawUnsafe<
-    {
-      category: string;
-    }[]
-  >(`SELECT DISTINCT category FROM Product ORDER BY category ASC`);
+  // Distinct categories via Prisma
+  const categories = await prisma.product.findMany({
+    distinct: ["category"],
+    select: { category: true },
+    orderBy: { category: "asc" },
+  });
 
-  // Para cada categoría, obtener top 5 por ventas (suma de quantity)
+  // For each category, obtain up to 5 products ordered by name
   const sections = await Promise.all(
     categories.map(async (c) => {
-      const items = await prisma.$queryRawUnsafe<
-        {
-          id: string;
-          name: string;
-          price: number;
-        }[]
-      >(
-        `SELECT id, name, price FROM Product WHERE category = ? ORDER BY name ASC LIMIT 5`,
-        c.category
-      );
+      const items = await prisma.product.findMany({
+        where: { category: c.category },
+        select: { id: true, name: true, price: true },
+        orderBy: { name: "asc" },
+        take: 5,
+      });
       return { category: c.category, items };
     })
   );

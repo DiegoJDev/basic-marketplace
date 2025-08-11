@@ -3,6 +3,7 @@
 import Container from "@/components/layout/Container";
 import Pagination from "@/components/ui/Pagination";
 import { useEffect, useState } from "react";
+import { formatDateTimeEs, orderStatusLabel } from "@/lib/i18n";
 import { useSearchParams } from "next/navigation";
 
 type Row = {
@@ -68,9 +69,7 @@ export default function DashboardOrdersPage() {
                   <td className="py-2 pr-4 tabular-nums">
                     {o.id.slice(0, 8)}…
                   </td>
-                  <td className="py-2 pr-4">
-                    {new Date(o.createdAt).toLocaleString()}
-                  </td>
+                  <td className="py-2 pr-4">{formatDateTimeEs(o.createdAt)}</td>
                   <td className="py-2 pr-4">{o.user.email}</td>
                   <td className="py-2 pr-4">{o.product.name}</td>
                   <td className="py-2 pr-4">{o.quantity}</td>
@@ -88,10 +87,18 @@ export default function DashboardOrdersPage() {
                       }}
                       className="rounded-md border border-gray-300 px-2 py-1 text-xs"
                     >
-                      <option value="PLACED">Realizada</option>
-                      <option value="PROCESSING">Procesando</option>
-                      <option value="SHIPPED">Enviada</option>
-                      <option value="CANCELLED">Cancelada</option>
+                      {(
+                        [
+                          "PLACED",
+                          "PROCESSING",
+                          "SHIPPED",
+                          "CANCELLED",
+                        ] as const
+                      ).map((v) => (
+                        <option key={v} value={v}>
+                          {orderStatusLabel(v)}
+                        </option>
+                      ))}
                     </select>
                   </td>
                 </tr>

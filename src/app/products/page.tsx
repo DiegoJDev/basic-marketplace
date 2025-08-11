@@ -1,17 +1,16 @@
 import Container from "@/components/layout/Container";
-import ResponsiveGrid from "@/components/layout/ResponsiveGrid";
-import StoreCard from "@/components/stores/StoreCard";
+import ProductGridWithQuickAdd from "@/components/products/ProductGridWithQuickAdd";
 import Pagination from "@/components/ui/Pagination";
 import { headers } from "next/headers";
 
-async function fetchStores(baseUrl: string, page: number, perPage: number) {
+async function fetchProducts(baseUrl: string, page: number, perPage: number) {
   const res = await fetch(
-    `${baseUrl}/api/stores?page=${page}&perPage=${perPage}`,
+    `${baseUrl}/api/products?page=${page}&perPage=${perPage}`,
     { cache: "no-store" }
   );
-  if (!res.ok) throw new Error("Failed to fetch stores");
+  if (!res.ok) throw new Error("Failed to fetch products");
   return res.json() as Promise<{
-    items: Array<{ id: string; name: string }>;
+    items: Array<{ id: string; name: string; price: number }>;
     total: number;
     page: number;
     perPage: number;
@@ -19,7 +18,7 @@ async function fetchStores(baseUrl: string, page: number, perPage: number) {
   }>;
 }
 
-export default async function StoresPage({
+export default async function ProductsPage({
   searchParams,
 }: {
   searchParams: { page?: string };
@@ -33,25 +32,26 @@ export default async function StoresPage({
     h.get("x-forwarded-proto") ??
     (process.env.NODE_ENV === "development" ? "http" : "https");
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${proto}://${host}`;
-  const data = await fetchStores(baseUrl, currentPage, perPage);
+  const data = await fetchProducts(baseUrl, currentPage, perPage);
 
   return (
     <div className="py-6">
       <Container>
-        <h1 className="text-xl font-semibold">Tiendas</h1>
+        <h1 className="text-xl font-semibold">Productos</h1>
         <div className="mt-6">
-          <ResponsiveGrid>
-            {data.items.map((s) => (
-              <StoreCard key={s.id} id={s.id} name={s.name} />
-            ))}
-          </ResponsiveGrid>
+          <ProductGridWithQuickAdd
+            products={data.items}
+            hrefBase="/products/"
+          />
         </div>
-
         <Pagination
           page={data.page}
           totalPages={data.totalPages}
-          prevHref={`/stores?page=${Math.max(1, data.page - 1)}`}
-          nextHref={`/stores?page=${Math.min(data.totalPages, data.page + 1)}`}
+          prevHref={`/products?page=${Math.max(1, data.page - 1)}`}
+          nextHref={`/products?page=${Math.min(
+            data.totalPages,
+            data.page + 1
+          )}`}
         />
       </Container>
     </div>

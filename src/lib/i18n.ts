@@ -33,6 +33,11 @@ export function formatUsdEs(amountInCents: number): string {
   });
 }
 
+export function formatDateTimeEs(value: string | number | Date): string {
+  const date = new Date(value);
+  return date.toLocaleString("es-ES");
+}
+
 export function categoryLabel(category: ProductCategory): string {
   switch (category) {
     case "Electronics":

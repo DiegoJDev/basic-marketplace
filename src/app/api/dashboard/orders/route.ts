@@ -1,30 +1,30 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
+import { requireBusiness } from "@/lib/api-auth";
+import { PER_PAGE } from "@/lib/config";
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "BUSINESS") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireBusiness();
+  if ("error" in auth) return auth.error;
   const { searchParams } = new URL(request.url);
   const page = Math.max(1, Number(searchParams.get("page") || 1));
-  const perPage = 5;
+  const perPage = PER_PAGE;
   const status = searchParams.get("status") || undefined;
 
   const stores = await prisma.store.findMany({
-    where: { ownerId: (session.user as { id: string }).id },
+    where: { ownerId: auth.userId },
     select: { id: true },
   });
   const storeIds = stores.map((s) => s.id);
 
-  const where = {
+  const where: NonNullable<
+    Parameters<typeof prisma.order.findMany>[0]
+  >["where"] = {
     product: { storeId: { in: storeIds } },
-    ...(status ? { status: status as any } : {}),
-  } as const;
+    ...(status
+      ? { status: status as "PLACED" | "PROCESSING" | "SHIPPED" | "CANCELLED" }
+      : {}),
+  };
 
   const [items, total] = await Promise.all([
     prisma.order.findMany({

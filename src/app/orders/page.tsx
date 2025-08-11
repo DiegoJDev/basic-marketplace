@@ -1,5 +1,6 @@
 import Container from "@/components/layout/Container";
 import Pagination from "@/components/ui/Pagination";
+import { formatDateTimeEs, formatUsdEs } from "@/lib/i18n";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
@@ -57,15 +58,11 @@ export default async function OrdersPage({
               <div>
                 <p className="font-medium">{o.product.name}</p>
                 <p className="text-xs text-gray-600">
-                  {(o.product.price / 100).toLocaleString(undefined, {
-                    style: "currency",
-                    currency: "USD",
-                  })}{" "}
-                  × {o.quantity}
+                  {formatUsdEs(o.product.price)} × {o.quantity}
                 </p>
               </div>
               <span className="text-xs text-gray-500">
-                {new Date(o.createdAt).toLocaleString()}
+                {formatDateTimeEs(o.createdAt)}
               </span>
             </li>
           ))}

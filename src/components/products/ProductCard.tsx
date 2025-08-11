@@ -2,6 +2,7 @@
 
 import Button from "@/components/ui/Button";
 import Link from "next/link";
+import { formatUsdEs } from "@/lib/i18n";
 import { useCart } from "@/components/providers/CartProvider";
 
 type ProductCardProps = {
@@ -35,9 +36,7 @@ export default function ProductCard({
         ) : (
           <h3 className="font-medium">{name}</h3>
         )}
-        <p className="mt-1 text-sm text-gray-600">
-          ${(price / 100).toFixed(2)}
-        </p>
+        <p className="mt-1 text-sm text-gray-600">{formatUsdEs(price)}</p>
         <div className="mt-3">
           <Button
             size="sm"

@@ -1,8 +1,6 @@
 import type { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
@@ -17,7 +15,7 @@ export const authOptions: NextAuthOptions = {
         const email = credentials?.email?.toLowerCase().trim();
         if (!email) return null;
         const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) return null; // sin auto-registro; usar /sign-up
+        if (!user) return null;
         return {
           id: user.id,
           email: user.email,
@@ -34,7 +32,6 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      // When logging in, copy id/role to token
       if (user) {
         const u = user as { id: string; role: "CLIENT" | "BUSINESS" };
         (token as { id?: string; role?: "CLIENT" | "BUSINESS" }).id = u.id;
@@ -43,7 +40,6 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      // Expose id/role in session.user
       if (session.user) {
         const t = token as { id?: string; role?: "CLIENT" | "BUSINESS" };
         (session.user as { id?: string; role?: "CLIENT" | "BUSINESS" }).id =
@@ -55,7 +51,6 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    // for NextAuth redirects (even with App Router)
     signIn: "/sign-in",
   },
 };

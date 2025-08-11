@@ -2,6 +2,7 @@
 
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import Button from "@/components/ui/Button";
+import { formatUsdEs } from "@/lib/i18n";
 import { useState } from "react";
 import { useCart } from "@/components/providers/CartProvider";
 import { X } from "lucide-react";
@@ -51,7 +52,7 @@ export default function ProductQuickAddModal({
               </button>
             </div>
             <p className="text-sm text-gray-600">
-              ${(product.price / 100).toFixed(2)}
+              {formatUsdEs(product.price)}
             </p>
 
             <div className="mt-4 flex items-center gap-2">

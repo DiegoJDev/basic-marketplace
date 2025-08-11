@@ -2,6 +2,7 @@
 
 import Container from "@/components/layout/Container";
 import { useCart } from "@/components/providers/CartProvider";
+import { formatUsdEs } from "@/lib/i18n";
 import Button from "@/components/ui/Button";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -55,11 +56,7 @@ export default function CartPage() {
                   <div>
                     <p className="font-medium">{i.name}</p>
                     <p className="text-sm text-gray-600">
-                      {(i.price / 100).toLocaleString(undefined, {
-                        style: "currency",
-                        currency: "USD",
-                      })}{" "}
-                      × {i.quantity}
+                      {formatUsdEs(i.price)} × {i.quantity}
                     </p>
                   </div>
                   <Button
@@ -74,12 +71,7 @@ export default function CartPage() {
             </ul>
             <div className="flex items-center justify-between">
               <p className="text-sm">Total</p>
-              <p className="font-medium">
-                {(total / 100).toLocaleString(undefined, {
-                  style: "currency",
-                  currency: "USD",
-                })}
-              </p>
+              <p className="font-medium">{formatUsdEs(total)}</p>
             </div>
             <div className="flex items-center justify-end gap-2">
               <Button variant="secondary" onClick={clear}>

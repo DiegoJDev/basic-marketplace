@@ -1,11 +1,6 @@
 import Container from "@/components/layout/Container";
-import ResponsiveGrid from "@/components/layout/ResponsiveGrid";
-import ProductCard from "@/components/products/ProductCard";
-import Link from "next/link";
 import ProductGridWithQuickAdd from "@/components/products/ProductGridWithQuickAdd";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 type Params = { params: { id: string } };
 

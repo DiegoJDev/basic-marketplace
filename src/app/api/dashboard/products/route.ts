@@ -1,29 +1,31 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import prisma from "@/lib/prisma";
+import { requireBusiness } from "@/lib/api-auth";
 import { productCreateSchema } from "@/lib/schemas";
-
-const prisma = new PrismaClient();
+import { PER_PAGE } from "@/lib/config";
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "BUSINESS") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireBusiness();
+  if ("error" in auth) return auth.error;
   const stores = await prisma.store.findMany({
-    where: { ownerId: (session.user as { id: string }).id },
+    where: { ownerId: auth.userId },
     select: { id: true },
   });
   const storeIds = stores.map((s: { id: string }) => s.id);
   const { searchParams } = new URL(request.url);
   const page = Math.max(1, Number(searchParams.get("page") || 1));
-  const perPage = 5;
+  const perPage = PER_PAGE;
   const [items, total] = await Promise.all([
     prisma.product.findMany({
       where: { storeId: { in: storeIds } },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, price: true, storeId: true },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        storeId: true,
+        category: true,
+      },
       skip: (page - 1) * perPage,
       take: perPage,
     }),
@@ -39,10 +41,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "BUSINESS") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireBusiness();
+  if ("error" in auth) return auth.error;
   const json = await request.json().catch(() => null);
   const parsed = productCreateSchema.safeParse(json);
   if (!parsed.success) {
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
 
   // Validate ownership of store
   const store = await prisma.store.findFirst({
-    where: { id: storeId, ownerId: (session.user as { id: string }).id },
+    where: { id: storeId, ownerId: auth.userId },
     select: { id: true },
   });
   if (!store) {

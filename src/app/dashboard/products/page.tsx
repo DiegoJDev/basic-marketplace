@@ -8,6 +8,8 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productCreateSchema, type ProductCreateInput } from "@/lib/schemas";
+import { formatUsdEs, categoryLabel } from "@/lib/i18n";
+import FieldError from "@/components/ui/FieldError";
 
 type Store = { id: string; name: string };
 type Product = {
@@ -29,15 +31,16 @@ export default function DashboardProductsPage() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<ProductCreateInput>({
     resolver: zodResolver(productCreateSchema),
+    mode: "onChange",
     defaultValues: { name: "", price: 0, storeId: "", category: "Electronics" },
   });
 
   async function load(p = 1) {
     const [storesRes, productsRes] = await Promise.all([
-      fetch(`/api/dashboard/stores?page=1`, { cache: "no-store" }),
+      fetch(`/api/dashboard/stores?perPage=all`, { cache: "no-store" }),
       fetch(`/api/dashboard/products?page=${p}`, { cache: "no-store" }),
     ]);
     if (storesRes.ok) setStores((await storesRes.json()).items);
@@ -54,7 +57,7 @@ export default function DashboardProductsPage() {
     load(p);
   }, [params]);
 
-  const canSubmit = useMemo(() => Object.keys(errors).length === 0, [errors]);
+  const canSubmit = isValid && !loading;
 
   const onCreate = handleSubmit(async (values) => {
     setLoading(true);
@@ -75,66 +78,88 @@ export default function DashboardProductsPage() {
       <Container>
         <h1 className="text-xl font-semibold">Productos</h1>
 
-        <form
-          onSubmit={onCreate}
-          className="mt-6 grid grid-cols-1 sm:grid-cols-[1fr_160px_200px_auto] gap-2 items-center"
-        >
-          <input
-            type="text"
-            {...register("name")}
-            placeholder="Nombre del producto"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-          />
-          {errors.name ? (
-            <p className="text-xs text-red-600">{errors.name.message}</p>
-          ) : null}
-          <input
-            type="number"
-            min={1}
-            {...register("price", { valueAsNumber: true })}
-            placeholder="Precio (cents)"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-          />
-          {errors.price ? (
-            <p className="text-xs text-red-600">{errors.price.message}</p>
-          ) : null}
-          <select
-            {...register("storeId")}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-          >
-            <option value="">Seleccionar tienda</option>
-            {stores.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-          {errors.storeId ? (
-            <p className="text-xs text-red-600">{errors.storeId.message}</p>
-          ) : null}
-          <select
-            {...register("category")}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-          >
-            <option value="Electronics">Electrónica</option>
-            <option value="Clothing">Ropa y accesorios</option>
-            <option value="Home">Hogar y cocina</option>
-            <option value="Beauty">Belleza y cuidado personal</option>
-            <option value="Sports">Deportes y aire libre</option>
-          </select>
-          {errors.category ? (
-            <p className="text-xs text-red-600">{errors.category.message}</p>
-          ) : null}
-          <Button disabled={loading || !canSubmit}>Crear</Button>
+        <form onSubmit={onCreate} className="mt-6 space-y-3">
+          <div>
+            <input
+              type="text"
+              {...register("name")}
+              placeholder="Nombre del producto"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            />
+            <FieldError message={errors.name?.message} />
+          </div>
+          <div>
+            <input
+              type="number"
+              min={1}
+              {...register("price", { valueAsNumber: true })}
+              placeholder="Precio (cents)"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            />
+            <FieldError message={errors.price?.message} />
+          </div>
+          <div>
+            <select
+              {...register("storeId")}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            >
+              <option value="">Seleccionar tienda</option>
+              {stores.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+            <FieldError message={errors.storeId?.message} />
+          </div>
+          <div>
+            <select
+              {...register("category")}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            >
+              <option value="Electronics">Electrónica</option>
+              <option value="Clothing">Ropa y accesorios</option>
+              <option value="Home">Hogar y cocina</option>
+              <option value="Beauty">Belleza y cuidado personal</option>
+              <option value="Sports">Deportes y aire libre</option>
+            </select>
+            <FieldError message={errors.category?.message} />
+          </div>
+          <div className="flex items-center justify-end">
+            <Button disabled={!canSubmit}>Crear</Button>
+          </div>
+          <div className="rounded-md bg-gray-50 p-3 text-xs text-gray-700">
+            <p className="font-medium">Condiciones para crear un producto</p>
+            <ul className="list-disc pl-5 mt-2 space-y-1">
+              <li>Nombre: mínimo 2 y máximo 120 caracteres.</li>
+              <li>Precio: entero positivo en centavos (ej. 1299 = $12.99).</li>
+              <li>Tienda: debes seleccionar una de tus tiendas.</li>
+              <li>Categoría: una de las opciones disponibles.</li>
+            </ul>
+            <p className="mt-2">
+              Ejemplo: &quot;Nombre: Basic Chair&quot;, &quot;Precio:
+              12999&quot;, &quot;Tienda: Store 1&quot;, &quot;Categoría:
+              Home&quot;.
+            </p>
+          </div>
         </form>
 
         <ul className="mt-6 space-y-2">
           {products.map((p) => (
             <li key={p.id} className="rounded-md border bg-white p-4">
-              <span className="font-medium">{p.name}</span>
-              <span className="ml-2 text-sm text-gray-600">
-                ${(p.price / 100).toFixed(2)}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">{p.name}</span>
+                {p.category ? (
+                  <span className="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
+                    {categoryLabel(
+                      p.category as unknown as import("@/lib/i18n").ProductCategory
+                    )}
+                  </span>
+                ) : null}
+                <span className="ml-auto text-sm text-gray-600">
+                  {formatUsdEs(p.price)}
+                </span>
+              </div>
             </li>
           ))}
         </ul>
