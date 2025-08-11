@@ -6,11 +6,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerUserSchema, type RegisterUserInput } from "@/lib/schemas";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const params = useSearchParams();
+  const callbackUrl = params.get("callbackUrl");
   const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
@@ -39,8 +41,13 @@ export default function SignUpPage() {
       setServerError("No pudimos iniciar sesión automáticamente");
       return;
     }
-    if (values.role === "BUSINESS") router.replace("/dashboard/stores");
-    else router.replace("/");
+    if (callbackUrl && values.role !== "BUSINESS") {
+      router.replace(callbackUrl);
+    } else if (values.role === "BUSINESS") {
+      router.replace("/dashboard/stores");
+    } else {
+      router.replace("/");
+    }
   });
 
   return (

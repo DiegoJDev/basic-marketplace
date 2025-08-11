@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { signIn, getSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
+  const params = useSearchParams();
+  const callbackUrl = params.get("callbackUrl");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,7 +23,11 @@ export default function SignInPage() {
         const role = (
           session?.user as { role?: "CLIENT" | "BUSINESS" } | null | undefined
         )?.role;
-        router.replace(role === "BUSINESS" ? "/dashboard" : "/");
+        if (callbackUrl && role !== "BUSINESS") {
+          router.replace(callbackUrl);
+        } else {
+          router.replace(role === "BUSINESS" ? "/dashboard" : "/");
+        }
       } else if (res?.error) {
         setErrorMessage("No pudimos iniciar sesión con ese email.");
       } else {
@@ -67,7 +73,14 @@ export default function SignInPage() {
 
         <p className="text-sm text-center text-neutral-600">
           Don’t have an account?{" "}
-          <a href="/sign-up" className="underline">
+          <a
+            href={`/sign-up${
+              callbackUrl
+                ? `?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                : ""
+            }`}
+            className="underline"
+          >
             Create one
           </a>
         </p>
