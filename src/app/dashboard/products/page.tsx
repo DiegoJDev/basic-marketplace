@@ -107,44 +107,11 @@ export default function DashboardProductsPage() {
 
         <ul className="mt-6 space-y-2">
           {products.map((p) => (
-            <li
-              key={p.id}
-              className="rounded-md border bg-white p-4 grid grid-cols-[1fr_auto_auto] gap-4 items-center"
-            >
-              <span>
-                {p.name} — ${(p.price / 100).toFixed(2)}
+            <li key={p.id} className="rounded-md border bg-white p-4">
+              <span className="font-medium">{p.name}</span>
+              <span className="ml-2 text-sm text-gray-600">
+                ${(p.price / 100).toFixed(2)}
               </span>
-              <button
-                className="text-sm text-blue-600 hover:underline"
-                onClick={async () => {
-                  const name = prompt("Nuevo nombre", p.name) ?? p.name;
-                  const priceStr =
-                    prompt("Nuevo precio (cents)", String(p.price)) ??
-                    String(p.price);
-                  const price = Number(priceStr);
-                  if (!name || !Number.isFinite(price) || price <= 0) return;
-                  await fetch(`/api/dashboard/products/${p.id}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ name, price }),
-                  });
-                  load();
-                }}
-              >
-                Editar
-              </button>
-              <button
-                className="text-sm text-red-600 hover:underline"
-                onClick={async () => {
-                  if (!confirm("¿Eliminar producto?")) return;
-                  await fetch(`/api/dashboard/products/${p.id}`, {
-                    method: "DELETE",
-                  });
-                  load();
-                }}
-              >
-                Eliminar
-              </button>
             </li>
           ))}
         </ul>
