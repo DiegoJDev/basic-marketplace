@@ -64,6 +64,12 @@ export default function Header() {
                 >
                   Products
                 </Link>
+                <Link
+                  href="/orders"
+                  className={navClass(pathname === "/orders")}
+                >
+                  Orders
+                </Link>
               </>
             )}
             <Link href="/about" className={navClass(pathname === "/about")}>

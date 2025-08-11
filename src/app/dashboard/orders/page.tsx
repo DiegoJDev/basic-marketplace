@@ -110,8 +110,7 @@ export default function DashboardOrdersPage() {
             </tbody>
           </table>
         </div>
-
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-6 flex items-center justify-between">
           <Button
             variant="secondary"
             disabled={page <= 1}

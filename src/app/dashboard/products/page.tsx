@@ -13,6 +13,8 @@ type Product = { id: string; name: string; price: number; storeId: string };
 export default function DashboardProductsPage() {
   const [stores, setStores] = useState<Store[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const {
     register,
@@ -24,13 +26,18 @@ export default function DashboardProductsPage() {
     defaultValues: { name: "", price: 0, storeId: "" },
   });
 
-  async function load() {
+  async function load(p = 1) {
     const [storesRes, productsRes] = await Promise.all([
-      fetch("/api/dashboard/stores", { cache: "no-store" }),
-      fetch("/api/dashboard/products", { cache: "no-store" }),
+      fetch(`/api/dashboard/stores?page=1`, { cache: "no-store" }),
+      fetch(`/api/dashboard/products?page=${p}`, { cache: "no-store" }),
     ]);
     if (storesRes.ok) setStores((await storesRes.json()).items);
-    if (productsRes.ok) setProducts((await productsRes.json()).items);
+    if (productsRes.ok) {
+      const data = await productsRes.json();
+      setProducts(data.items);
+      setPage(data.page);
+      setTotalPages(data.totalPages);
+    }
   }
 
   useEffect(() => {
@@ -141,6 +148,25 @@ export default function DashboardProductsPage() {
             </li>
           ))}
         </ul>
+        <div className="mt-6 flex items-center justify-between">
+          <Button
+            variant="secondary"
+            disabled={page <= 1}
+            onClick={() => load(page - 1)}
+          >
+            ← Anterior
+          </Button>
+          <span className="text-sm text-gray-600">
+            Página {page} de {totalPages}
+          </span>
+          <Button
+            variant="secondary"
+            disabled={page >= totalPages}
+            onClick={() => load(page + 1)}
+          >
+            Siguiente →
+          </Button>
+        </div>
       </Container>
     </div>
   );

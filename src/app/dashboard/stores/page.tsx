@@ -11,6 +11,8 @@ type Store = { id: string; name: string };
 
 export default function DashboardStoresPage() {
   const [items, setItems] = useState<Store[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const {
     register,
@@ -19,11 +21,15 @@ export default function DashboardStoresPage() {
     formState: { errors },
   } = useForm<StoreCreateInput>({ resolver: zodResolver(storeCreateSchema) });
 
-  async function load() {
-    const res = await fetch("/api/dashboard/stores", { cache: "no-store" });
+  async function load(p = 1) {
+    const res = await fetch(`/api/dashboard/stores?page=${p}`, {
+      cache: "no-store",
+    });
     if (res.ok) {
       const data = await res.json();
       setItems(data.items);
+      setPage(data.page);
+      setTotalPages(data.totalPages);
     }
   }
 
@@ -75,6 +81,26 @@ export default function DashboardStoresPage() {
             </li>
           ))}
         </ul>
+
+        <div className="mt-6 flex items-center justify-between">
+          <Button
+            variant="secondary"
+            disabled={page <= 1}
+            onClick={() => load(page - 1)}
+          >
+            ← Anterior
+          </Button>
+          <span className="text-sm text-gray-600">
+            Página {page} de {totalPages}
+          </span>
+          <Button
+            variant="secondary"
+            disabled={page >= totalPages}
+            onClick={() => load(page + 1)}
+          >
+            Siguiente →
+          </Button>
+        </div>
       </Container>
     </div>
   );

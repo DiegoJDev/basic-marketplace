@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
 import { headers, cookies } from "next/headers";
 
-async function fetchOrdersWithAuth() {
+async function fetchOrdersWithAuth(page: number) {
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
   const proto =
@@ -13,7 +13,7 @@ async function fetchOrdersWithAuth() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${proto}://${host}`;
   const cookieHeader = (await cookies()).toString();
 
-  const res = await fetch(`${baseUrl}/api/orders`, {
+  const res = await fetch(`${baseUrl}/api/orders?page=${page}`, {
     cache: "no-store",
     headers: { cookie: cookieHeader },
   });
@@ -25,14 +25,23 @@ async function fetchOrdersWithAuth() {
       quantity: number;
       product: { id: string; name: string; price: number };
     }>;
+    total: number;
+    page: number;
+    perPage: number;
+    totalPages: number;
   };
 }
 
-export default async function OrdersPage() {
+export default async function OrdersPage({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/sign-in?callbackUrl=/orders");
 
-  const data = await fetchOrdersWithAuth();
+  const currentPage = Math.max(1, Number(searchParams?.page || 1));
+  const data = await fetchOrdersWithAuth(currentPage);
 
   return (
     <div className="py-6">
@@ -60,6 +69,23 @@ export default async function OrdersPage() {
             </li>
           ))}
         </ul>
+        <div className="mt-6 flex items-center justify-between">
+          <a
+            className="text-sm text-gray-700 hover:text-black"
+            href={`/orders?page=${Math.max(1, data.page - 1)}`}
+          >
+            ← Anterior
+          </a>
+          <span className="text-sm text-gray-600">
+            Página {data.page} de {data.totalPages}
+          </span>
+          <a
+            className="text-sm text-gray-700 hover:text-black"
+            href={`/orders?page=${Math.min(data.totalPages, data.page + 1)}`}
+          >
+            Siguiente →
+          </a>
+        </div>
       </Container>
     </div>
   );
