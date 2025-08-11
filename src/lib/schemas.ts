@@ -61,3 +61,11 @@ export const orderUpdateSchema = z.object({
 });
 
 export type OrderUpdateInput = z.infer<typeof orderUpdateSchema>;
+
+export const registerUserSchema = z.object({
+  email: z.string().email("Email inválido"),
+  name: z.string().min(2, "Mínimo 2 caracteres").max(80, "Máximo 80"),
+  role: z.enum(["CLIENT", "BUSINESS"]),
+});
+
+export type RegisterUserInput = z.infer<typeof registerUserSchema>;

@@ -65,6 +65,13 @@ export default function SignInPage() {
           {isLoading ? "Ingresando..." : "Continue"}
         </button>
 
+        <p className="text-sm text-center text-neutral-600">
+          Don’t have an account?{" "}
+          <a href="/sign-up" className="underline">
+            Create one
+          </a>
+        </p>
+
         <p className="text-xs text-neutral-500">
           Tip: Usa <b>client@example.com</b> (rol CLIENT) o{" "}
           <b>business@example.com</b> (rol BUSINESS, creado en tu seed).

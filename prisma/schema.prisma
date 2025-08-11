@@ -57,8 +57,6 @@ model Order {
   createdAt  DateTime    @default(now())
   quantity   Int
   status     OrderStatus @default(PLACED)
-
-  // Associations required by the test
   user       User        @relation("OrderUser", fields: [userId], references: [id])
   userId     String
   product    Product     @relation(fields: [productId], references: [id])

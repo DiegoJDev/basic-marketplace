@@ -20,9 +20,20 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // Allow-list for BUSINESS: only /dashboard* and /about
+  if (token && (token as { role?: string }).role === "BUSINESS") {
+    const allowed =
+      pathname === "/about" ||
+      pathname === "/dashboard" ||
+      pathname.startsWith("/dashboard/");
+    if (!allowed) {
+      return NextResponse.redirect(new URL("/dashboard/stores", req.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard", "/dashboard/:path*"],
+  matcher: ["/(.*)"],
 };

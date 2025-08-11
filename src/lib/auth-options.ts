@@ -16,21 +16,18 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         const email = credentials?.email?.toLowerCase().trim();
         if (!email) return null;
-
-        // Look for email; if not found, create as CLIENT (simple login/registration)
-        let user = await prisma.user.findUnique({ where: { email } });
-        if (!user) {
-          user = await prisma.user.create({
-            data: { email, role: "CLIENT" },
-          });
-        }
-
-        // NextAuth only needs to return an object with id/email/name/role
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (!user) return null; // sin auto-registro; usar /sign-up
         return {
           id: user.id,
           email: user.email,
           name: user.name ?? null,
           role: user.role,
+        } as unknown as {
+          id: string;
+          email: string;
+          name: string | null;
+          role: "CLIENT" | "BUSINESS";
         };
       },
     }),
