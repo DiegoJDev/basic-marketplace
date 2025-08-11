@@ -2,6 +2,18 @@
 
 Tecnologías: Next.js (App Router), TypeScript, NextAuth (JWT), Prisma ORM (SQLite), Tailwind CSS v4, Headless UI, React Hook Form + Zod.
 
+## Cómo empezar (clonar desde GitHub)
+
+1. En GitHub, copia el enlace del repositorio (HTTPS o SSH).
+2. Clona el proyecto y entra al directorio:
+
+```bash
+git clone <URL_DEL_REPOSITORIO>
+cd basic-marketplace
+```
+
+3. Continúa con la sección "Configuración (paso a paso)" a continuación.
+
 ## Requisitos
 
 - Node 18+
@@ -21,6 +33,7 @@ npm install
 ```bash
 DATABASE_URL="file:./prisma/dev.db"
 NEXTAUTH_SECRET="dev-secret-change-me"
+NEXTAUTH_URL="http://localhost:3000"
 ```
 
 3. Base de datos (migraciones + seed)
